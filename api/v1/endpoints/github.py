@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Path, Body, status
 
 from schemas.github import (
-    IssueCreate, PullRequestCreate, RepoQueryParams, IssueQueryParams, CommitQueryParams,RepoResponse, IssueCreateResponse,IssueResponse,CommitResponse
+    IssueCreate, PullRequestCreate, RepoQueryParams, IssueQueryParams, CommitQueryParams,Repo
 )
 
 from services.github_service import get_github_service, GitHubService
@@ -14,15 +14,9 @@ async def fetch_repos(
     q: RepoQueryParams = Depends(),
     svc: GitHubService = Depends(get_github_service),
 ):  
-    """
-    Fetch repositories for a given user or organization.
-    
-    You must provide exactly one of either `username` or `org_name` in the query parameters.
-    Supports pagination, type filtering (public, private, forks, etc.), and sorting.
-    
-    Raises:
-        HTTPException(400): If both or neither of `username` and `org_name` are provided.
-    """
+    '''
+    Fetch repositories for a user or organization
+    '''
     username = q.username or ''
     org_name = q.org_name or ''
     if bool(username.strip()) == bool(org_name.strip()):
@@ -52,38 +46,28 @@ async def fetch_repos(
         )
 
 
-@router.post("/{owner}/{repo}/issues", response_model=IssueCreateResponse)
+@router.post("/{owner}/{repo}/issues", response_model=dict)
 async def new_issue(
     issue: IssueCreate = Body(...),
     owner: str = Path(...),
     repo: str = Path(...),
     svc: GitHubService = Depends(get_github_service)
 ):
-    """
-    Create a new issue in a specific repository.
-    
-    Accepts issue details such as title, body, labels, milestones, and assignees.
-    Only the title is explicitly required. Authentication with appropriate GitHub token permissions
-    is required to successfully create an issue on the target repository.
-    """
+    """Create a new issue in a repository"""
     result = await svc.create_issue(owner, repo, **issue.model_dump(exclude_none=True))
     return {"message": "Issue created", "issue": result}
 
 
-@router.get('/{owner}/{repo}/issues', response_model=IssueResponse)
+@router.get('/{owner}/{repo}/issues', response_model=list)
 async def get_issues(
     owner: str = Path(...),
     repo: str = Path(...),
     q: IssueQueryParams = Depends(),
     svc: GitHubService = Depends(get_github_service),
 ):
-    """
-    List issues in a specified repository.
-    
-    Supports filtering by issue state (open/closed/all), specific labels, and relationship 
-    filters (assigned to you, created by you, mentioned, etc.). Also supports pagination
-    and sorting configurations.
-    """
+    '''
+    List issues in a repository
+    '''
     return await svc.list_issues(
         owner=owner,
         repo=repo,
@@ -98,19 +82,14 @@ async def get_issues(
     )
 
 
-@router.get("/{owner}/{repo}/commits", response_model=CommitResponse)
+@router.get("/{owner}/{repo}/commits", response_model=list)
 async def fetch_repo_commits(
     q: CommitQueryParams = Depends(),
     owner: str = Path(...),
     repo: str = Path(...),
     svc: GitHubService = Depends(get_github_service)
 ):
-    """
-    Fetch the commit history from a repository.
-    
-    Allows filtering by starting SHA/branch, author/committer usernames, specific file paths,
-    and date ranges (since/until). This endpoint is fully paginated.
-    """
+    """Fetch commits from a repository"""
 
     return await svc.get_commits(
         owner,
@@ -126,16 +105,7 @@ async def new_pull_request(
     repo: str = Path(...),
     svc: GitHubService = Depends(get_github_service)
 ):
-    """
-    Create a new Pull Request.
-    
-    Requires the source branch (`head`) and the target branch (`base`). 
-    You must provide either a `title` (to create a PR from scratch) OR an `issue` number 
-    (to convert an existing issue into a PR).
-    
-    Raises:
-        HTTPException(400): If you provide both or neither of `title` and `issue`.
-    """
+    """Create a pull request"""
 
     title = pr.title
     issue = pr.issue

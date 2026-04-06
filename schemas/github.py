@@ -2,9 +2,6 @@ from pydantic import BaseModel, Field, ConfigDict
 from typing import List, Optional, Literal
 from datetime import datetime
 
-# =============================================================================
-# SHARED PARAMETERS
-# =============================================================================
 
 class PaginationParams(BaseModel):
     """Pagination parameters for Github API requests."""
@@ -14,9 +11,6 @@ class PaginationParams(BaseModel):
     direction: Optional[Literal["asc", "desc"]] = "desc"
 
 
-# =============================================================================
-# QUERY GUIDELINES (GET Requests)
-# =============================================================================
 
 class RepoQueryParams(PaginationParams):
     username: str = ""
@@ -62,10 +56,7 @@ class CommitQueryParams(PaginationParams):
     )
 
 
-# =============================================================================
-# RESPONSE MODELS (Output Serialization)
-# =============================================================================
-
+# Response models (GitHub API returns dicts/lists)
 class Repo(BaseModel):
     id: int
     name: str
@@ -95,9 +86,6 @@ class Commit(BaseModel):
 
     model_config = ConfigDict(extra="allow")
 
-# =============================================================================
-# Responses
-# =============================================================================
 
 RepoResponse = List[Repo]
 IssueResponse = List[Issue]
@@ -106,9 +94,6 @@ class IssueCreateResponse(BaseModel):
     message: str
     issue: Issue
 
-# =============================================================================
-# REQUEST MODELS (POST/PUT/PATCH Bodies)
-# =============================================================================
 
 class IssueCreate(BaseModel):
     title: str = Field(
