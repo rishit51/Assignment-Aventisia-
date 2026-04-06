@@ -1,0 +1,23 @@
+# Environments
+venv/
+.venv/
+env/
+.env
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# IDEs and Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Temporary & Cache files
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
