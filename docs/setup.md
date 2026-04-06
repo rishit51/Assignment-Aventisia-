@@ -9,7 +9,7 @@
 1. **Clone the repository:**
    ```
    git clone <repo-url>
-   cd app
+   cd Assignment-Aventisia-
    ```
 
 2. **Create virtual environment:**
@@ -57,6 +57,6 @@ curl "http://localhost:8000/api/v1/github/repos?username=octocat"
 
 ## Troubleshooting
 - **Token errors**: Ensure PAT has `repo` scope.
-- **CORS/Host**: Adjust `--host` for external access.
+
 - **Docs**: See `docs/api_endpoints.md` for full endpoint details.
 
